@@ -28,8 +28,6 @@ intents.message_content = True
 # Create a discord client with intents
 client = discord.Client(intents=intents)
 
-#api_endpoint = "https://api.cobalt.tools/api/json"
-
 headers = {
     "Accept": "application/json",
     "Content-Type": "application/json"
@@ -88,16 +86,13 @@ async def on_message(message):
                 print("Response:")
                 video_url = response.json()["url"]
                 print(video_url)
-                #download_video(video_url, video_filename)
                 if('video.' in video_url):
                     download_video(video_url, video_filename)
                 else:
                     raise ValueError(f"'{video_url}' - not a video")
                 with open(video_filename, 'rb') as f:
                     video = discord.File(f)
-                    # fileslist = [picture,video]
                     fileslist = [video]
-                    # await message.reply(embed=embedVar,files=fileslist)
                     videoFlag = True
                     await message.reply(files=fileslist)
                 os.remove(video_filename)
@@ -114,8 +109,8 @@ async def on_message(message):
                     aws_access_key_id=s3_aws_access_key_id,
                     aws_secret_access_key=s3_aws_secret_access_key
                 )
-                Bclient.upload_file(video_filename,  # Path to local file
-                s3_space,  # Name of Space
+                Bclient.upload_file(video_filename,
+                s3_space,
                 f'x/{video_filename}',
                 ExtraArgs={'ACL':'public-read','ContentType':'video/mp4'})
                 os.remove(video_filename)
