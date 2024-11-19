@@ -65,6 +65,9 @@ async def on_message(message):
         link = urls[0]
         print(link)
 
+        content_without_url = re.sub(url_pattern, '', content)
+        content_without_url = content_without_url.rstrip()
+
         username = link.split('/')[3]
         tweet_id = link.split('/')[5]
         video_filename = f"{username}_{tweet_id}.mp4"
@@ -72,7 +75,7 @@ async def on_message(message):
 
         response = requests.head(video_url)
         if response.status_code == 200:
-            await message.reply(f"Repost!\n{video_url}")
+            await message.reply(f"(Repost)\n{message.author.mention}: {content_without_url}\n{video_url}")
             return
         
         videoFlag = False
@@ -94,7 +97,7 @@ async def on_message(message):
                     video = discord.File(f)
                     fileslist = [video]
                     videoFlag = True
-                    await message.reply(files=fileslist)
+                    await message.reply(content=f'{message.author.mention}: {content_without_url}',files=fileslist)
                 os.remove(video_filename)
                 print("video deleted")
             else:
@@ -114,7 +117,7 @@ async def on_message(message):
                 f'x/{video_filename}',
                 ExtraArgs={'ACL':'public-read','ContentType':'video/mp4'})
                 os.remove(video_filename)
-                await message.reply(f'Video is too big for Discord\n{video_url}')
+                await message.reply(f'Video is too big for Discord\n{message.author.mention}: {content_without_url}\n{video_url}')
             else:
                 try:
                     print(e)
@@ -128,7 +131,7 @@ async def on_message(message):
                     with open(filename, 'rb') as f:
                         picture = discord.File(f)
                         fileslist = [picture]
-                        await message.reply(files=[picture])
+                        await message.reply(content=f'{message.author.mention}: {content_without_url}',files=[picture])
                     os.remove(filename)
                     print("image deleted")
                 except Exception as e2:
